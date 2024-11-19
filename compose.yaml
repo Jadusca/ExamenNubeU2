@@ -1,0 +1,39 @@
+services:
+  maestro:
+    build:
+      context: .
+      dockerfile: dockerfile_maestro
+    environment:
+      - DB_HOST: db
+      - DB_NAME: maestros
+      - DB_USER: root
+      - DB_PASSWORD: jademm03
+      - API_ALUMNO: alumno:80
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+      - alumno
+  alumno:
+    build:
+      context: .
+      dockerfile: dockerfile_alumno
+    environment:
+      - DB_HOST: db
+      - DB_NAME: alumnos
+      - DB_USER: root
+      - DB_PASSWORD: jademm03
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+  db:
+    image: mysql:latest
+    environment:
+      - MYSQL_ROOT_PASSWORD: jademm03
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./alumno.sql:/docker-entrypoint-initdb.d/alumno.sql
+      - ./maestro.sql:/docker-entrypoint-initdb.d/maestro.sql
+volumes:
+  db_data:
